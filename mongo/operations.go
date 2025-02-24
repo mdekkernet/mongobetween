@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -423,7 +424,8 @@ func (m *opMsg) Error() error {
 	if !ok {
 		return nil
 	}
-	return driver.ExtractErrorFromServerResponse(single.msg)
+
+	return driver.ExtractErrorFromServerResponse(context.Background(), single.msg)
 }
 
 func (m *opMsg) Unacknowledged() bool {
@@ -569,7 +571,7 @@ func (r *opReply) Error() error {
 	if len(r.documents) == 0 {
 		return nil
 	}
-	return driver.ExtractErrorFromServerResponse(r.documents[0])
+	return driver.ExtractErrorFromServerResponse(context.Background(), r.documents[0])
 }
 
 func (r *opReply) Unacknowledged() bool {
