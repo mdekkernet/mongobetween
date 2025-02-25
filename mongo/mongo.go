@@ -60,7 +60,7 @@ func Connect(log *zap.Logger, sd *statsd.Client, opts *options.ClientOptions, pi
 
 	if ping {
 		log.Info("Ping")
-		err = c.Ping(ctx, readpref.Primary())
+		err = c.Ping(ctx, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -254,8 +254,8 @@ func (m *Mongo) selectServer(requestCursorID int64, collection string, transDeta
 
 	// Select a server
 	selector := description.CompositeSelector([]description.ServerSelector{
-		description.ReadPrefSelector(readpref.Primary()),   // ignored by sharded clusters
-		description.LatencySelector(15 * time.Millisecond), // default localThreshold for the client
+		description.ReadPrefSelector(m.opts.ReadPreference), // ignored by sharded clusters
+		description.LatencySelector(*m.opts.LocalThreshold), // default localThreshold for the client
 	})
 	return m.topology.SelectServer(m.roundTripCtx, selector)
 }
